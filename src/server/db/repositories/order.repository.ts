@@ -1,3 +1,4 @@
+import { logger } from "@/config/logger";
 import { Order } from "@/server/checkout/entities/order";
 import { prisma } from "../prisma.service";
 
@@ -36,6 +37,7 @@ export class OrderRepository {
   }
 
   async findAll() {
+    logger.info('fetching all orders');
     return prisma.order.findMany({
       include: {
         orderItem: {

@@ -1,3 +1,4 @@
+import { logger } from "@/config/logger";
 import { randomUUID } from "crypto";
 import { OrderRepository } from "../db/repositories/order.repository";
 import { CreateOrderDto } from "./dto/create-order.dto";
@@ -11,6 +12,7 @@ export class OrderService {
   
   async create(createOrderDto: CreateOrderDto) {
     const { paymentMethod, products, coupon } = createOrderDto;
+    logger.info('init proccess to create order');
     const orderItems = products.map(
       product => new OrderItem(
         randomUUID(),
@@ -19,13 +21,21 @@ export class OrderService {
         product.quantity
       )
     );
+    logger.info("order items created", {
+      orderItems
+    });
     const order = new Order(randomUUID(), orderItems, paymentMethod);
     let discount = 0;
     if (coupon) {
       //todo: calculate discount
       discount = 0;
     }
+    logger.info("saving order on db", {
+      order,
+    });
     await this.orderRepository.create(order);
+    logger.info("order saved");
+    return order;
   }
 
   async findAll() {
